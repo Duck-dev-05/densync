@@ -90,7 +90,7 @@ jobs:
           fi
           ${{ matrix.pip-cmd }} install -r requirements.txt
           ${{ matrix.pip-cmd }} install pyinstaller
-          ${{ matrix.python-cmd }} -m PyInstaller --onefile --name backend --collect-all torchvision --collect-all transformers --copy-metadata tqdm --copy-metadata regex --copy-metadata requests --copy-metadata packaging --copy-metadata filelock --copy-metadata numpy --copy-metadata tokenizers --copy-metadata huggingface-hub --copy-metadata safetensors --copy-metadata pyyaml main.py
+          ${{ matrix.python-cmd }} -m PyInstaller --onefile --name backend --collect-all torchvision --collect-all transformers main.py
         
       - name: Move backend to src-tauri
         run: |

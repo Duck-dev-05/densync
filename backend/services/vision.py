@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
+import transformers.models.qwen2_vl.processing_qwen2_vl
 from PIL import Image
 
 model_id = "Qwen/Qwen2-VL-2B-Instruct"

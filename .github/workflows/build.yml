@@ -7,6 +7,8 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -64,6 +66,7 @@ jobs:
       - name: build python backend
         run: |
           cd backend
+          ${{ matrix.pip-cmd }} install torch torchvision --index-url https://download.pytorch.org/whl/cpu
           ${{ matrix.pip-cmd }} install -r requirements.txt
           ${{ matrix.pip-cmd }} install pyinstaller
           ${{ matrix.python-cmd }} -m PyInstaller --onefile --name backend main.py

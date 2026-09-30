@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+transformers
+torch
+torchvision
+Pillow
+einops
+timm
+sqlmodel

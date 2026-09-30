@@ -1,0 +1,16 @@
+Densync End User License Agreement (EULA)
+
+1. ACCEPTANCE OF TERMS
+By installing and using Densync, you agree to be bound by these terms.
+
+2. LICENSE GRANT
+Densync grants you a personal, non-exclusive, non-transferable license to use the application.
+
+3. RESTRICTIONS
+You may not reverse engineer, decompile, or disassemble the application.
+
+4. DISCLAIMER OF WARRANTY
+The software is provided "as is", without warranty of any kind.
+
+5. LIMITATION OF LIABILITY
+In no event shall the authors or copyright holders be liable for any claim, damages, or other liability.

@@ -8,3 +8,4 @@ Pillow
 einops
 timm
 sqlmodel
+appdirs

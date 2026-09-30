@@ -109,3 +109,14 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ startsWith(matrix.os, 'macos') && format('--target {0}', matrix.target) || '' }}
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Densync-${{ matrix.target }}
+          path: |
+            src-tauri/target/**/release/bundle/**/*.exe
+            src-tauri/target/**/release/bundle/**/*.msi
+            src-tauri/target/**/release/bundle/**/*.dmg
+            src-tauri/target/**/release/bundle/**/*.AppImage
+            src-tauri/target/**/release/bundle/**/*.deb

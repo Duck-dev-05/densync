@@ -108,11 +108,7 @@ jobs:
         shell: bash
 
       - name: build tauri app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: ${{ startsWith(matrix.os, 'macos') && format('--target {0}', matrix.target) || '' }}
+        run: npm run tauri build ${{ startsWith(matrix.os, 'macos') && format('--target {0}', matrix.target) || '' }}
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4

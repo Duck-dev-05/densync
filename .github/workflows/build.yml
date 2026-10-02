@@ -104,11 +104,20 @@ jobs:
       - name: Move backend to src-tauri
         run: |
           mkdir -p src-tauri/bin
-          cp backend/dist/backend* src-tauri/bin/${{ matrix.backend-name }}
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp backend/dist/backend.exe src-tauri/bin/backend.exe
+          else
+            cp backend/dist/backend src-tauri/bin/backend
+            chmod +x src-tauri/bin/backend
+          fi
         shell: bash
 
       - name: build tauri app
-        run: npm run tauri build ${{ startsWith(matrix.os, 'macos') && format('--target {0}', matrix.target) || '' }}
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ startsWith(matrix.os, 'macos') && format('--target {0}', matrix.target) || '' }}
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4

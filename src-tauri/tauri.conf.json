@@ -31,9 +31,6 @@
     "copyright": "© 2026 Densync Team",
     "shortDescription": "Densync AI Factory Analytics",
     "longDescription": "Densync is a comprehensive real-time factory analytics and AI management dashboard.",
-    "externalBin": [
-      "bin/backend"
-    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

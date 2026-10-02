@@ -5,6 +5,7 @@ import {
   Clock, Thermometer, Gauge, Play, Pause, RotateCcw,
   Network, ArrowRight
 } from 'lucide-react';
+import { authHeaders } from '../lib/api';
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState<'alerts' | 'analysis' | 'kpis'>('alerts');
@@ -33,7 +34,7 @@ export function Dashboard() {
     const fetchAnalytics = async () => {
       if (!isMonitoring) return;
       try {
-        const res = await fetch("http://localhost:8000/api/analytics/factory");
+        const res = await fetch("http://localhost:8000/api/analytics/factory", { headers: authHeaders() });
         const data = await res.json();
         if (data.status === "success") {
           setStats([

@@ -1,14 +1,18 @@
 import { useState  } from "react";
 import {
   Map, Users, Video, Book, Edit, Settings, Cpu,
-  ChevronLeft, ChevronRight, Zap, BarChart3, Router, Bell,
+  ChevronLeft, ChevronRight, Zap, BarChart3, Router, Bell, LogOut,
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { canAccessPage } from '../access/rbac';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
+// RBAC: nav items are filtered per role via src/access/rbac.ts —
+// pages a role cannot access are hidden automatically.
 const navGroups = [
   {
     label: 'Live Operations',
@@ -25,6 +29,7 @@ const navGroups = [
       { id: 'knowledge', icon: Book,  label: 'Global Knowledge', badge: null  },
       { id: 'ai-management', icon: Cpu, label: 'Model Management', badge: null },
       { id: 'solutions', icon: Users, label: 'Expert Ranking',   badge: null  },
+      { id: 'my-solutions', icon: Users, label: 'My Solutions', badge: null },
     ]
   },
   {
@@ -41,6 +46,13 @@ const navGroups = [
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const { user, logout } = useAuth();
+
+  // Filter navigation items based on user role (central role-access map)
+  const filteredNavGroups = navGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => canAccessPage(item.id, user?.role))
+  })).filter(group => group.items.length > 0);
 
   return (
     <aside
@@ -105,7 +117,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         overflowY: 'auto', overflowX: 'hidden',
         position: 'relative', zIndex: 1,
       }}>
-        {navGroups.map(({ label, items }) => (
+        {filteredNavGroups.map(({ label, items }) => (
           <div key={label}>
             {!collapsed ? (
               <div style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', padding: '0 0.6rem', marginBottom: '0.35rem' }}>
@@ -186,16 +198,49 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: collapsed ? '0.6rem' : '0.6rem 0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', justifyContent: collapsed ? 'center' : 'flex-start', marginTop: '0.25rem' }}>
           <div style={{ width: '32px', height: '32px', borderRadius: '9px', flexShrink: 0, background: 'linear-gradient(135deg, #3b82f6, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, color: '#fff', boxShadow: '0 0 14px rgba(99,102,241,0.4)' }}>
-            AD
+            {user ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'GU'}
           </div>
           {!collapsed && (
             <div style={{ flex: 1, overflow: 'hidden' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Admin User</div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user ? user.name : 'Guest User'}
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.1rem' }}>
                 <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 5px #10b981', flexShrink: 0 }} />
-                <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: 600 }}>System Online</span>
+                <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: 600 }}>
+                  {user ? user.role.replace('_', ' ').toUpperCase() : 'NOT LOGGED IN'}
+                </span>
               </div>
             </div>
+          )}
+          {!collapsed && (
+            <button
+              onClick={logout}
+              title="Switch Account"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                background: 'rgba(239,68,68,0.1)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.18s',
+                flexShrink: 0
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'rgba(239,68,68,0.2)';
+                e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'rgba(239,68,68,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)';
+              }}
+            >
+              <LogOut size={14} style={{ color: '#ef4444' }} />
+            </button>
           )}
         </div>
       </div>

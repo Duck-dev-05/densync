@@ -3,14 +3,14 @@ from sqlmodel import Session, select
 import random
 import subprocess
 from database import get_session
-import random
-from database import get_session
-from models import UserRanking, AiFeedbackQueue
+from models import UserRanking, AiFeedbackQueue, User
+from auth import get_current_user, require_expert_or_admin
 
 router = APIRouter(prefix="/api")
 
 @router.get("/analytics/factory")
-async def get_factory_analytics():
+async def get_factory_analytics(current_user: User = Depends(get_current_user)):
+    """Factory-wide telemetry. Visible to every authenticated role (Factory Monitor)."""
     # Simulated live telemetry data
     return {
         "status": "success",
@@ -28,12 +28,20 @@ async def get_factory_analytics():
     }
 
 @router.get("/leaderboard")
-async def get_leaderboard(session: Session = Depends(get_session)):
+async def get_leaderboard(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    """Expert Ranking board - every authenticated role can read it."""
     rankings = session.exec(select(UserRanking).order_by(UserRanking.score.desc())).all()
     return {"status": "success", "data": rankings}
 
 @router.get("/analytics/ai")
-async def get_ai_analytics(session: Session = Depends(get_session)):
+async def get_ai_analytics(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(require_expert_or_admin),
+):
+    """Model Management telemetry - Factory Expert / System Admin only (matches RBAC)."""
     queue = session.exec(select(AiFeedbackQueue).where(AiFeedbackQueue.status == "pending")).all()
     
     # Read real local GPU telemetry using nvidia-smi
@@ -74,7 +82,13 @@ async def get_ai_analytics(session: Session = Depends(get_session)):
     }
 
 @router.post("/analytics/ai/queue/{task_id}")
-async def update_ai_queue(task_id: str, payload: dict, session: Session = Depends(get_session)):
+async def update_ai_queue(
+    task_id: str,
+    payload: dict,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(require_expert_or_admin),
+):
+    """Approve/reject a queued AI prediction - Factory Expert / System Admin only."""
     action = payload.get("action")
     if action not in ["approved", "rejected"]:
         return {"status": "error", "message": "Invalid action"}

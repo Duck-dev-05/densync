@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 import urllib.request
 import urllib.parse
 import json
@@ -7,11 +7,12 @@ from datetime import datetime
 from sqlmodel import Session, select
 from database import engine
 from models import KnowledgeArticle
+from auth import get_current_user, require_expert_or_admin
 
 router = APIRouter(prefix="/api")
 
 @router.get("/knowledge")
-async def get_knowledge():
+async def get_knowledge(current_user = Depends(get_current_user)):
     search_terms = ["Robotics", "Industrial engineering", "Hydraulics", "Electronics"]
     records = []
     

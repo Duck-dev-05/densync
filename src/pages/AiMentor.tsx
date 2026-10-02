@@ -6,6 +6,7 @@ import {
   RefreshCw, Download
 } from 'lucide-react';
 import { GlassCard } from '../components/ui';
+import { authHeaders } from '../lib/api';
 
 const Typewriter = ({ text, delay = 0, speed = 20 }: { text: string, delay?: number, speed?: number }) => {
   const [displayed, setDisplayed] = useState('');
@@ -66,6 +67,7 @@ export function AiMentor() {
       try {
         const res = await fetch("http://localhost:8000/api/analyze", {
           method: "POST",
+          headers: authHeaders(),
           body: formData });
         const data = await res.json();
         setAiResult(data);
@@ -110,6 +112,7 @@ export function AiMentor() {
     try {
       const res = await fetch("http://localhost:8000/api/analyze", {
         method: "POST",
+        headers: authHeaders(),
         body: formData });
       const data = await res.json();
       setAiResult(data);

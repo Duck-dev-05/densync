@@ -1,13 +1,17 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Depends
 import io
 import re
 from PIL import Image
 from services.vision import run_qwen
+from auth import get_current_user
 
 router = APIRouter(prefix="/api")
 
 @router.post("/analyze")
-async def analyze_image(file: UploadFile = File(...)):
+async def analyze_image(
+    file: UploadFile = File(...),
+    current_user = Depends(get_current_user)
+):
     contents = await file.read()
     image = Image.open(io.BytesIO(contents)).convert("RGB")
     width, height = image.size

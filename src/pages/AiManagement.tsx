@@ -2,6 +2,7 @@ import { useState, useEffect  } from "react";
 import { 
   Server, Database, Check, X,
   Crosshair, BrainCircuit, LineChart } from 'lucide-react';
+import { authHeaders } from '../lib/api';
 
 export function AiManagement() {
   const [queue, setQueue] = useState<any[]>([]);
@@ -13,7 +14,7 @@ export function AiManagement() {
   useEffect(() => {
     const fetchAiData = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/analytics/ai');
+        const res = await fetch('http://localhost:8000/api/analytics/ai', { headers: authHeaders() });
         const data = await res.json();
         if (data.status === 'success') {
           setQueue(data.data.queue);
@@ -39,7 +40,7 @@ export function AiManagement() {
     try {
       await fetch(`http://localhost:8000/api/analytics/ai/queue/${id}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ action: action === 'approve' ? 'approved' : 'rejected' })
       });
     } catch (err) {

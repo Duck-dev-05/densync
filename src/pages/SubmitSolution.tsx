@@ -4,6 +4,8 @@ import {
   AlignLeft, ListOrdered, Zap, Shield, ChevronRight,
   AlertTriangle, Tag, Globe, Star, BookOpen
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { apiPost } from '../lib/api';
 
 const fieldStyle: React.CSSProperties = {
   background: 'rgba(255,255,255,0.03)',
@@ -32,6 +34,7 @@ const labelStyle: React.CSSProperties = {
 const steps = ['Error ', 'Root Cause', 'Upload ', 'Review'];
 
 export function SubmitSolution() {
+  const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [currentStep] = useState(0);
   const [dragOver, setDragOver] = useState(false);
@@ -41,7 +44,7 @@ export function SubmitSolution() {
   
   // API form states
   const [title, setTitle] = useState('#ERR-502');
-  const [factoryLocation, setFactoryLocation] = useState('');
+  const [factoryLocation, setFactoryLocation] = useState(user?.factory_location ?? '');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -132,18 +135,14 @@ export function SubmitSolution() {
             e.preventDefault(); 
             setIsSubmitting(true);
             try {
-              const res = await fetch("http://localhost:8000/api/submit-cause", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  title: title,
-                  description: description,
-                  severity: severity,
-                  category: category,
-                  factory_location: factoryLocation
-                })
+              const res = await apiPost("/submit-cause", {
+                title: title,
+                description: description,
+                severity: severity,
+                category: category,
+                factory_location: factoryLocation
               });
-              if(res.ok) setSubmitted(true);
+              if (res) setSubmitted(true);
             } catch(e) {
               console.error(e);
             } finally {

@@ -3,6 +3,7 @@ import {
   Search, Database, User, MapPin, Calendar, PlayCircle, FileText,
   CheckCircle, XCircle, TrendingUp, Filter, Globe, Zap, BookOpen, BarChart2, ChevronRight, Download, Eye
 } from 'lucide-react';
+import { authHeaders } from '../lib/api';
 
 
 
@@ -22,7 +23,7 @@ export function KnowledgeBase() {
   const [archives, setArchives] = useState<any[]>([]);
   
   useEffect(() => {
-    fetch("http://localhost:8000/api/knowledge")
+    fetch("http://localhost:8000/api/knowledge", { headers: authHeaders() })
       .then(res => res.json())
       .then(data => {
         if(data.status === "success") {

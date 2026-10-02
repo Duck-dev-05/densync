@@ -46,7 +46,8 @@
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": true
-      }
+      },
+      "staticVCRuntime": true
     }
   }
 }

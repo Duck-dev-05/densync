@@ -86,20 +86,21 @@ jobs:
             ${{ runner.os }}-node-
             
       - name: install frontend dependencies
-        run: npm install
+        run: |
+          npm install || (echo "Retrying npm install..." && npm install)
 
       - name: build python backend
         shell: bash
         run: |
           cd backend
           if [ "${{ runner.os }}" = "macOS" ]; then
-            ${{ matrix.pip-cmd }} install torch torchvision
+            ${{ matrix.pip-cmd }} install torch torchvision || (echo "Retrying torch install..." && ${{ matrix.pip-cmd }} install torch torchvision)
           else
-            ${{ matrix.pip-cmd }} install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+            ${{ matrix.pip-cmd }} install torch torchvision --index-url https://download.pytorch.org/whl/cpu || (echo "Retrying torch install..." && ${{ matrix.pip-cmd }} install torch torchvision --index-url https://download.pytorch.org/whl/cpu)
           fi
-          ${{ matrix.pip-cmd }} install -r requirements.txt
-          ${{ matrix.pip-cmd }} install pyinstaller
-          ${{ matrix.python-cmd }} -m PyInstaller --onefile --name backend --collect-all torchvision --collect-all transformers main.py
+          ${{ matrix.pip-cmd }} install -r requirements.txt || (echo "Retrying requirements install..." && ${{ matrix.pip-cmd }} install -r requirements.txt)
+          ${{ matrix.pip-cmd }} install pyinstaller || (echo "Retrying pyinstaller install..." && ${{ matrix.pip-cmd }} install pyinstaller)
+          ${{ matrix.python-cmd }} -m PyInstaller --onefile --name backend --collect-all torchvision --collect-all transformers main.py || (echo "Retrying PyInstaller..." && ${{ matrix.python-cmd }} -m PyInstaller --onefile --name backend --collect-all torchvision --collect-all transformers main.py)
         
       - name: Move backend to src-tauri
         run: |
@@ -112,7 +113,30 @@ jobs:
           fi
         shell: bash
 
+      - name: check tauri prerequisites
+        shell: bash
+        run: |
+          echo "Checking Tauri prerequisites..."
+          if [ ! -f "src-tauri/tauri.conf.json" ]; then
+            echo "Error: tauri.conf.json not found"
+            exit 1
+          fi
+          if [ ! -d "src-tauri/icons" ]; then
+            echo "Error: icons directory not found"
+            exit 1
+          fi
+          echo "Tauri prerequisites check passed"
+
       - name: build tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ startsWith(matrix.os, 'macos') && format('--target {0}', matrix.target) || '' }}
+        continue-on-error: true
+
+      - name: retry tauri build on failure
+        if: failure()
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

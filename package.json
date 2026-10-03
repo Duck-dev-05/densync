@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "build:fix": "powershell -ExecutionPolicy Bypass -File fix-build-errors.ps1 -Command \"npm run build\"",
+    "tauri:build:fix": "powershell -ExecutionPolicy Bypass -File fix-build-errors.ps1 -Command \"npm run tauri build\""
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

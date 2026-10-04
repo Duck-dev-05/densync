@@ -39,6 +39,9 @@
       "icons/icon.ico"
     ],
     "licenseFile": "License.txt",
+    "externalBin": [
+      "bin/backend"
+    ],
     "windows": {
       "nsis": {
         "installMode": "currentUser",

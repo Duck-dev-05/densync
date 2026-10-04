@@ -11,9 +11,27 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             use tauri_plugin_shell::ShellExt;
-            let sidecar_command = app.shell().sidecar("backend").unwrap();
-            let (_rx, _child) = sidecar_command.spawn().expect("Failed to spawn sidecar");
-            Ok(())
+            // Try to spawn the backend sidecar, but don't fail if it doesn't work
+            match app.shell().sidecar("bin/backend") {
+                Ok(sidecar_command) => {
+                    match sidecar_command.spawn() {
+                        Ok((_rx, _child)) => {
+                            println!("Backend sidecar spawned successfully");
+                            Ok(())
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to spawn backend sidecar: {}", e);
+                            // Don't fail the app - continue without backend
+                            Ok(())
+                        }
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Failed to get backend sidecar: {}", e);
+                    // Don't fail the app - continue without backend
+                    Ok(())
+                }
+            }
         })
         .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())

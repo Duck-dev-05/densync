@@ -101,6 +101,30 @@ jobs:
           fi
         shell: bash
 
+      - name: verify version
+        run: |
+          echo "Checking version in files..."
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            powershell -Command "Get-Content package.json | Select-String 'version'"
+            powershell -Command "Get-Content src-tauri/tauri.conf.json | Select-String 'version'"
+          else
+            grep '"version"' package.json
+            grep '"version"' src-tauri/tauri.conf.json
+          fi
+        shell: bash
+
+      - name: output version
+        id: version
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            VERSION=$(powershell -Command "(Get-Content package.json | ConvertFrom-Json).version")
+          else
+            VERSION=$(grep -oP '(?<=\"version\": ")[^"]*' package.json)
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+        shell: bash
+
       - name: install frontend dependencies
         run: |
           npm install || (echo "Retrying npm install..." && npm install)
@@ -162,7 +186,7 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Densync-${{ matrix.target }}
+          name: Densync-${{ steps.version.outputs.version }}-${{ matrix.target }}
           path: |
             src-tauri/target/**/release/bundle/**/*.exe
             src-tauri/target/**/release/bundle/**/*.msi

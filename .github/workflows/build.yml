@@ -119,7 +119,7 @@ jobs:
           if [ "${{ runner.os }}" = "Windows" ]; then
             VERSION=$(powershell -Command "(Get-Content package.json | ConvertFrom-Json).version")
           else
-            VERSION=$(grep -oP '(?<=\"version\": ")[^"]*' package.json)
+            VERSION=$(node -p "require('./package.json').version")
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"

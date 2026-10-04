@@ -1,7 +1,7 @@
 {
   "name": "densync",
   "private": true,
-  "version": "0.1.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "build:fix": "powershell -ExecutionPolicy Bypass -File fix-build-errors.ps1 -Command \"npm run build\"",
-    "tauri:build:fix": "powershell -ExecutionPolicy Bypass -File fix-build-errors.ps1 -Command \"npm run tauri build\""
+    "tauri:build:fix": "powershell -ExecutionPolicy Bypass -File fix-build-errors.ps1 -Command \"npm run tauri build\"",
+    "version:update": "powershell -ExecutionPolicy Bypass -File update-version.ps1"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

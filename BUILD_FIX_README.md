@@ -2,6 +2,35 @@
 
 This project includes an automated system to detect and fix common build errors, particularly when packages fail with exit code 1.
 
+## Version Management
+
+The project automatically manages versions based on git tags. When you push a tag to GitHub, the CI/CD pipeline will automatically update the version in `package.json` and `src-tauri/tauri.conf.json` before building.
+
+### Local Version Update
+
+To update the version locally from a git tag:
+```powershell
+npm run version:update
+```
+
+Or specify a version manually:
+```powershell
+.\update-version.ps1 -Version "2.0.0"
+```
+
+### Creating a New Release
+
+1. Make your changes and commit them
+2. Create a git tag:
+   ```bash
+   git tag v2.0.0
+   git push origin v2.0.0
+   ```
+3. GitHub Actions will automatically:
+   - Update the version in configuration files
+   - Build the application with the correct version
+   - Create a release with the tagged version
+
 ## Problem
 
 The most common cause of build failures on Windows is PowerShell's execution policy blocking npm scripts:
